@@ -18,6 +18,7 @@ public class Event {
     private String price;
     private String date;
     private User creator;
+    private Integer creatorId;
 
     public static Event fromEntity(EventEntity eventEntity) {
         Event event = new Event();
@@ -26,6 +27,7 @@ public class Event {
         event.setDescription(eventEntity.getDescription());
         event.setPrice(eventEntity.getPrice() + "");
         event.setDate(DateUtil.coverLocalDateToString(eventEntity.getDate()));
+        event.setCreatorId(eventEntity.getCreatorId());
         return event;
     }
 }

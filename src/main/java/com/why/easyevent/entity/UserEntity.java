@@ -14,7 +14,7 @@ import lombok.Data;
  */
 
 @Data
-@TableName(value = "tb_name")
+@TableName(value = "tb_user")
 public class UserEntity {
     @TableId(type = IdType.AUTO)
     private Integer id;

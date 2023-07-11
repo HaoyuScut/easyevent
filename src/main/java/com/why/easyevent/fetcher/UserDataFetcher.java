@@ -1,10 +1,7 @@
 package com.why.easyevent.fetcher;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.netflix.graphql.dgs.DgsComponent;
-import com.netflix.graphql.dgs.DgsMutation;
-import com.netflix.graphql.dgs.DgsQuery;
-import com.netflix.graphql.dgs.InputArgument;
+import com.netflix.graphql.dgs.*;
 import com.why.easyevent.entity.EventEntity;
 import com.why.easyevent.entity.UserEntity;
 import com.why.easyevent.mapper.EventEntityMapper;
@@ -33,9 +30,20 @@ public class UserDataFetcher {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserDataFetcher(UserEntityMapper userEntityMapper, PasswordEncoder passwordEncoder) {
+    private final EventEntityMapper eventEntityMapper;
+
+    public UserDataFetcher(UserEntityMapper userEntityMapper, PasswordEncoder passwordEncoder, EventEntityMapper eventEntityMapper) {
         this.userEntityMapper = userEntityMapper;
         this.passwordEncoder = passwordEncoder;
+        this.eventEntityMapper = eventEntityMapper;
+    }
+
+    @DgsQuery
+    public List<User> users() {
+        List<UserEntity> userEntities = userEntityMapper.selectList(new QueryWrapper<>());
+        List<User> userList = userEntities.stream()
+                .map(User::fromEntity).collect(Collectors.toList());
+        return userList;
     }
 
     @DgsMutation
@@ -49,6 +57,17 @@ public class UserDataFetcher {
         userEntityMapper.insert(userEntity);
 
         return User.fromEntity(userEntity);
+    }
+
+    @DgsData(parentType = "User", field = "createdEvents")
+    public List<Event> createdEvents(DgsDataFetchingEnvironment dgs) {
+        User user = dgs.getSource();
+        QueryWrapper<EventEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(EventEntity::getCreatorId, user.getId());
+        List<EventEntity> eventEntities = eventEntityMapper.selectList(queryWrapper);
+        List<Event> eventList = eventEntities.stream()
+                .map(Event::fromEntity).collect(Collectors.toList());
+        return eventList;
     }
 
 

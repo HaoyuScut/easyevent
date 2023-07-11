@@ -1,10 +1,7 @@
 package com.why.easyevent.fetcher;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.netflix.graphql.dgs.DgsComponent;
-import com.netflix.graphql.dgs.DgsMutation;
-import com.netflix.graphql.dgs.DgsQuery;
-import com.netflix.graphql.dgs.InputArgument;
+import com.netflix.graphql.dgs.*;
 import com.why.easyevent.entity.EventEntity;
 import com.why.easyevent.entity.UserEntity;
 import com.why.easyevent.mapper.EventEntityMapper;
@@ -13,6 +10,7 @@ import com.why.easyevent.type.Event;
 import com.why.easyevent.type.EventInput;
 import com.why.easyevent.type.User;
 import com.why.easyevent.util.DateUtil;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,25 +28,17 @@ import java.util.stream.Collectors;
  */
 
 @DgsComponent
+@RequiredArgsConstructor
 public class EventDataFetcher {
 
     private final EventEntityMapper eventEntityMapper;
     private final UserEntityMapper userEntityMapper;
 
-    public EventDataFetcher(EventEntityMapper eventEntityMapper, UserEntityMapper userEntityMapper) {
-        this.eventEntityMapper = eventEntityMapper;
-        this.userEntityMapper = userEntityMapper;
-    }
-
     @DgsQuery
     public List<Event> events() {
         List<EventEntity> eventEntities = eventEntityMapper.selectList(new QueryWrapper<EventEntity>());
         List<Event> eventList = eventEntities.stream()
-                .map(eventEntity -> {
-                    Event event = Event.fromEntity(eventEntity);
-                    populateEventWithUser(event, eventEntity.getCreatorId());
-                    return event;
-                }).collect(Collectors.toList());
+                .map(Event::fromEntity).collect(Collectors.toList());
         return eventList;
     }
 
@@ -60,15 +50,22 @@ public class EventDataFetcher {
 
         Event event = Event.fromEntity(eventEntity);
 
-        populateEventWithUser(event, eventEntity.getCreatorId());
-
         return event;
     }
 
-    private void populateEventWithUser(Event event, Integer userId) {
-        UserEntity userEntity = userEntityMapper.selectById(userId);
+//    private void populateEventWithUser(Event event, Integer userId) {
+//        UserEntity userEntity = userEntityMapper.selectById(userId);
+//        User user = User.fromEntity(userEntity);
+//        event.setCreator(user);
+//    }
+
+    @DgsData(parentType = "Event", field = "creator")
+    public User creator(DgsDataFetchingEnvironment dfe) {
+        Event event = dfe.getSource();
+        Integer creatorId = event.getCreatorId();
+        UserEntity userEntity = userEntityMapper.selectById((int) event.getCreatorId());
         User user = User.fromEntity(userEntity);
-        event.setCreator(user);
+        return user;
     }
 
 

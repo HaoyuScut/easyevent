@@ -16,7 +16,7 @@ import java.time.LocalDate;
  * @Version: v1.0
  */
 @Data
-@TableName(value = "event")
+@TableName(value = "tb_event")
 public class EventEntity {
     @TableId(type = IdType.AUTO)
     private Integer id;
