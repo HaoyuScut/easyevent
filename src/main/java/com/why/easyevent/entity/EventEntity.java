@@ -32,7 +32,7 @@ public class EventEntity {
         eventEntity.setDescription(input.getDescription());
         float priceInput = Float.parseFloat(input.getPrice());
         eventEntity.setPrice(priceInput);
-        eventEntity.setDate(DateUtil.coverISOStringToLocalDate(input.getDate()));
+        eventEntity.setDate(DateUtil.coverStringToLocalDate(input.getDate()));
         return eventEntity;
     }
 }

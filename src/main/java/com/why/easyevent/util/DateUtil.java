@@ -10,13 +10,13 @@ import java.time.format.DateTimeFormatter;
  * @Version: v1.0
  */
 public class DateUtil {
-    public static LocalDate coverISOStringToLocalDate(String isoDataString) {
+    public static LocalDate coverStringToLocalDate(String isoDataString) {
         DateTimeFormatter struct = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parse = LocalDate.parse(isoDataString, struct);
         return parse;
     }
 
-    public static String coverLocalDateToISOString(LocalDate date) {
+    public static String coverLocalDateToString(LocalDate date) {
         DateTimeFormatter struct = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String format = struct.format(date);
         return format;
