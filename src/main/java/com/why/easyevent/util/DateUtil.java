@@ -1,0 +1,25 @@
+package com.why.easyevent.util;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * @ClassName: {NAME}
+ * @Auther: why
+ * @Date: 2023/07/11 10 17
+ * @Version: v1.0
+ */
+public class DateUtil {
+    public static LocalDate coverISOStringToLocalDate(String isoDataString) {
+        DateTimeFormatter struct = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate parse = LocalDate.parse(isoDataString, struct);
+        return parse;
+    }
+
+    public static String coverLocalDateToISOString(LocalDate date) {
+        DateTimeFormatter struct = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String format = struct.format(date);
+        return format;
+    }
+
+}
