@@ -2,12 +2,15 @@ package com.why.easyevent.fetcher;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.netflix.graphql.dgs.*;
+import com.netflix.graphql.dgs.context.DgsContext;
+import com.why.easyevent.custom.AuthContext;
 import com.why.easyevent.entity.EventEntity;
 import com.why.easyevent.entity.UserEntity;
 import com.why.easyevent.mapper.EventEntityMapper;
 import com.why.easyevent.mapper.UserEntityMapper;
 import com.why.easyevent.type.*;
 import com.why.easyevent.utils.TokenUtils;
+import graphql.schema.DataFetchingEnvironment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,14 +41,26 @@ public class UserDataFetcher {
         this.eventEntityMapper = eventEntityMapper;
     }
 
+    /**
+     * 查询User
+     * @return
+     */
     @DgsQuery
-    public List<User> users() {
+    public List<User> users(DataFetchingEnvironment dfe) {
+        AuthContext authContext = DgsContext.getCustomContext(dfe);
+        authContext.ensureAuthenticated();
+
         List<UserEntity> userEntities = userEntityMapper.selectList(new QueryWrapper<>());
         List<User> userList = userEntities.stream()
                 .map(User::fromEntity).collect(Collectors.toList());
         return userList;
     }
 
+    /**
+     * 登录校验
+     * @param loginInput
+     * @return
+     */
     @DgsQuery
     public AuthData login(@InputArgument LoginInput loginInput) {
         UserEntity userEntity = finduserByEmail(loginInput.getEmail());
@@ -62,13 +77,18 @@ public class UserDataFetcher {
 
         String token = TokenUtils.signToken(id, 1);
 
-        AuthData authData = new AuthData();
-        authData.setUserId(id);
-        authData.setToken(token);
-        authData.setTokenExpiration(1);
+        AuthData authData = new AuthData()
+                .setUserId(id)
+                .setToken(token)
+                .setTokenExpiration(1);
         return authData;
     }
 
+    /**
+     * 创建用户
+     * @param userInput
+     * @return
+     */
     @DgsMutation
     public User createUser(@InputArgument UserInput userInput) {
         ensureUserNotExists(userInput);//判断用户不存在
@@ -94,6 +114,10 @@ public class UserDataFetcher {
     }
 
 
+    /**
+     * 通过userInput的email判断email地址是否已经被使用
+     * @param userInput
+     */
     private void ensureUserNotExists(UserInput userInput) {
         QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(UserEntity::getEmail, userInput.getEmail());
@@ -102,6 +126,11 @@ public class UserDataFetcher {
         }
     }
 
+    /**
+     * 通过email查找到User用户并返回
+     * @param email
+     * @return
+     */
     private UserEntity finduserByEmail(String email) {
         QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(UserEntity::getEmail, email);

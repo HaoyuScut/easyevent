@@ -31,6 +31,10 @@ public class EventDataFetcher {
     private final EventEntityMapper eventEntityMapper;
     private final UserEntityMapper userEntityMapper;
 
+    /**
+     * 查询事件-event
+     * @return
+     */
     @DgsQuery
     public List<Event> events() {
         List<EventEntity> eventEntities = eventEntityMapper.selectList(new QueryWrapper<EventEntity>());
@@ -39,6 +43,12 @@ public class EventDataFetcher {
         return eventList;
     }
 
+    /**
+     * 创建事件
+     * @param eventInput
+     * @param dfe
+     * @return
+     */
     @DgsMutation
     public Event createEvent(@InputArgument EventInput eventInput,DataFetchingEnvironment dfe) {
         AuthContext authContext = DgsContext.getCustomContext(dfe);
@@ -56,11 +66,16 @@ public class EventDataFetcher {
         return event;
     }
 
-//    private void populateEventWithUser(Event event, Integer userId) {
-//        UserEntity userEntity = userEntityMapper.selectById(userId);
-//        User user = User.fromEntity(userEntity);
-//        event.setCreator(user);
-//    }
+//    /**
+//     * 使用userId查询User并填充至event
+//     * @param event
+//     * @param userId
+//     */
+    /*private void populateEventWithUser(Event event, Integer userId) {
+        UserEntity userEntity = userEntityMapper.selectById(userId);
+        User user = User.fromEntity(userEntity);
+        event.setCreator(user);
+    }*/
 
     @DgsData(parentType = "Event", field = "creator")
     public User creator(DgsDataFetchingEnvironment dfe) {

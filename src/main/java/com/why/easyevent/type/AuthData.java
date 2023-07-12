@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
  * @Version: v1.0
  */
 @Data
+@Accessors(chain = true)
 public class AuthData {
     private Integer userId;
     private String token;

@@ -6,6 +6,7 @@ import com.why.easyevent.mapper.UserEntityMapper;
 import com.why.easyevent.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
@@ -21,6 +22,7 @@ import java.util.Map;
 @Slf4j
 @Component
 public class AuthContextBuilder implements DgsCustomContextBuilderWithRequest {
+
 
     private final UserEntityMapper userEntityMapper;
 
@@ -38,7 +40,7 @@ public class AuthContextBuilder implements DgsCustomContextBuilderWithRequest {
             return authContext;
         }
         String authorization = httpHeaders.getFirst(AUTHORIZATION_HEADER);
-        String token = authorization.replace("Bearer", "");
+        String token = authorization.replace("Bearer ", "");
 
         Integer userId;
         try {
