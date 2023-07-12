@@ -6,10 +6,9 @@ import com.why.easyevent.entity.EventEntity;
 import com.why.easyevent.entity.UserEntity;
 import com.why.easyevent.mapper.EventEntityMapper;
 import com.why.easyevent.mapper.UserEntityMapper;
-import com.why.easyevent.type.Event;
-import com.why.easyevent.type.EventInput;
-import com.why.easyevent.type.User;
-import com.why.easyevent.type.UserInput;
+import com.why.easyevent.type.*;
+import com.why.easyevent.utils.TokenUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,6 +22,7 @@ import java.util.stream.Collectors;
  * @Version: v1.0
  */
 
+@Slf4j
 @DgsComponent
 public class UserDataFetcher {
 
@@ -44,6 +44,29 @@ public class UserDataFetcher {
         List<User> userList = userEntities.stream()
                 .map(User::fromEntity).collect(Collectors.toList());
         return userList;
+    }
+
+    @DgsQuery
+    public AuthData login(@InputArgument LoginInput loginInput) {
+        UserEntity userEntity = finduserByEmail(loginInput.getEmail());
+        if(userEntity == null) {
+            throw new RuntimeException("使用该email地址用户不存在");
+        }
+        boolean match = passwordEncoder.matches(loginInput.getPassword(), userEntity.getPassword());
+        if(!match) {
+            throw new RuntimeException("密码不正确");
+        }
+
+        Integer id = userEntity.getId();
+        log.info("userId = {}", id);
+
+        String token = TokenUtils.signToken(id, 1);
+
+        AuthData authData = new AuthData();
+        authData.setUserId(id);
+        authData.setToken(token);
+        authData.setTokenExpiration(1);
+        return authData;
     }
 
     @DgsMutation
@@ -77,5 +100,11 @@ public class UserDataFetcher {
         if(userEntityMapper.selectCount(queryWrapper) >= 1) {
             throw new RuntimeException("该email地址已经被使用");
         }
+    }
+
+    private UserEntity finduserByEmail(String email) {
+        QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(UserEntity::getEmail, email);
+        return userEntityMapper.selectOne(queryWrapper);
     }
 }

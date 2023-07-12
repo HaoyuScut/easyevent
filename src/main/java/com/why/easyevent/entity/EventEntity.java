@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.why.easyevent.type.EventInput;
-import com.why.easyevent.util.DateUtil;
+import com.why.easyevent.utils.DateUtils;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -34,8 +34,8 @@ public class EventEntity {
         eventEntity.setDescription(input.getDescription());
         float priceInput = Float.parseFloat(input.getPrice());
         eventEntity.setPrice(priceInput);
-        eventEntity.setDate(DateUtil.coverStringToLocalDate(input.getDate()));
-        eventEntity.setCreatorId((input.getCreatorId()));
+        eventEntity.setDate(DateUtils.coverStringToLocalDate(input.getDate()));
+//        eventEntity.setCreatorId((input.getCreatorId()));
         return eventEntity;
     }
 }

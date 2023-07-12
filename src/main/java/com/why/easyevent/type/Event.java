@@ -1,7 +1,7 @@
 package com.why.easyevent.type;
 
 import com.why.easyevent.entity.EventEntity;
-import com.why.easyevent.util.DateUtil;
+import com.why.easyevent.utils.DateUtils;
 import lombok.Data;
 
 /**
@@ -26,7 +26,7 @@ public class Event {
         event.setTitle(eventEntity.getTitle());
         event.setDescription(eventEntity.getDescription());
         event.setPrice(eventEntity.getPrice() + "");
-        event.setDate(DateUtil.coverLocalDateToString(eventEntity.getDate()));
+        event.setDate(DateUtils.coverLocalDateToString(eventEntity.getDate()));
         event.setCreatorId(eventEntity.getCreatorId());
         return event;
     }

@@ -14,5 +14,5 @@ public class EventInput {
     private String description;
     private String price;
     private String date;
-    private Integer creatorId;
+//    private Integer creatorId;
 }

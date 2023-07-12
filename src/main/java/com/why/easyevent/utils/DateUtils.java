@@ -1,4 +1,4 @@
-package com.why.easyevent.util;
+package com.why.easyevent.utils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
  * @Date: 2023/07/11 10 17
  * @Version: v1.0
  */
-public class DateUtil {
+public class DateUtils {
     public static LocalDate coverStringToLocalDate(String isoDataString) {
         DateTimeFormatter struct = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parse = LocalDate.parse(isoDataString, struct);
